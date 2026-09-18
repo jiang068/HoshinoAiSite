@@ -4,11 +4,23 @@
 
 模型处理链把 21 个 OBJ 分块重组为 7 个可独立开关的场景图层，人物保持原三角面精度，场景按视觉重要性减面，再由 Blender 导出 Draco 压缩 GLB。网页无需 CDN、框架、后端或在线模型服务；声音也是本地 Web Audio 程序合成，不包含动画歌曲。
 
-**原模型出处：[推しの子 - アイ / Sketchfab](https://sketchfab.com/models/20103e3eccd8433fbc7ebf7bd193143f/)**。网页页脚也保留了来源。模型和贴图不是本项目原创，公开发布前必须核实原作者与许可证，详见 [ATTRIBUTION.md](ATTRIBUTION.md)。
+**原模型来源：[推しの子 - アイ / Sketchfab](https://sketchfab.com/models/20103e3eccd8433fbc7ebf7bd193143f/)**。网页页脚也保留了来源。模型和贴图不是本项目原创；如有侵权或不适合公开展示，请通过本项目仓库 Issue 联系我，我会及时删除相关内容。详见 [ATTRIBUTION.md](ATTRIBUTION.md)。
 
 ## 1. 本地运行与体验
 
-需要现有 Node.js 20+。在本目录执行：
+需要 Node.js 20+。首次使用先安装依赖：
+
+```powershell
+npm ci
+```
+
+开发预览可运行：
+
+```powershell
+npm run dev
+```
+
+也可以使用本地静态服务器：
 
 ```powershell
 .\start-server.ps1
@@ -64,7 +76,7 @@ hoshino-viewer/
 npm run build
 ```
 
-输出 `dist/`，会先清空旧产物，再通过 Vite 完成 HTML/CSS/JS 压缩、Three.js Tree Shaking、内容 hash 和动态 chunk 拆分。首屏只加载应援页业务代码，Three.js 舞台在页面可用后按需加载；图片、模型和 Draco 文件作为静态资源保留。此命令**不会联网发布**，也不创建 GitHub Actions 或 Cloudflare 配置。
+输出 `dist/`，会先清空旧产物，再通过 Vite 完成 HTML/CSS/JS 压缩、Three.js Tree Shaking、内容 hash 和动态 chunk 拆分。首屏只加载应援页业务代码，Three.js 舞台在页面可用后按需加载；图片、模型和 Draco 文件作为静态资源保留。此命令**不会联网发布**。
 
 开发预览使用 `npm run dev`；检查生产产物使用：
 
@@ -74,7 +86,7 @@ node server.mjs 8011 --dist
 
 只读服务器会对 HTML、JS、CSS、JSON 和 Markdown 自动使用 Brotli/gzip，并对内容 hash 的 bundle 设置长期缓存；模型和图片不会被重复压缩。
 
-可用 `node server.mjs 8011 --dist` 独立预览发布目录，确认它不依赖父目录的模型或 node_modules。
+也可以运行 `npm run start:dist` 预览生产版，确认它不依赖父目录的模型或 `node_modules`。
 
 ## 3. 应援页怎样把内容、镜头与演出绑在一起
 
@@ -86,7 +98,7 @@ node server.mjs 8011 --dist
 
 页面刻意不让 3D 人物每幕都站在正中央：封面以官方演唱会近景和中央标题统领全屏，不使用左右分栏；灯光控制和安可是明确的 3D 舞台；人物资料与幕后章节把 WebGL 画面降成模糊、低亮背景；应援和未拆信件章节直接隐藏 3D 人物，用官网新年/情人节视觉、角色立绘、第一话剧照、切片、遮挡条和证据标签承担主画面。每种主图只承担一个章节角色，避免同一立绘反复出现。
 
-图片层只使用可追溯到动画官网的角色立绘、新年视觉、情人节视觉和角色歌 Vol.1 封面，具体页面见 `docs/SOURCES.md`。这些图片用于本地非商业原型不代表取得公开再分发许可；上线前仍需核实使用条件，必要时替换为自有素材。
+图片层使用动画官网的角色立绘、新年视觉、情人节视觉和角色歌 Vol.1 封面，具体来源见 `docs/SOURCES.md`。如有侵权或不适合公开展示，请通过本项目仓库 Issue 联系我，我会及时删除相关图片。
 
 模型贴图本身已经烘焙了卡通明暗，网页不会用强 PBR 灯把颜色洗白；主题主要通过 emissive tint、加色光束、粒子与 CSS 渐变共同完成。WebGL 加载失败时，前景七幕仍可浏览并显示重试入口。页面遵循 `prefers-reduced-motion`，支持键盘焦点、ARIA live 公告和原生对话框。
 
@@ -216,7 +228,7 @@ npm test
 - 转换和浏览器脚本只改当前进程环境变量，并在退出时恢复；不写系统环境、不安装全局包。
 - `.gitignore` 排除缓存、原 OBJ/MTL、ZIP、node_modules 和 dist。vendor 运行依赖及许可证纳入版本控制，保证克隆后可直接运行。
 - 当前只有本地 Git `main` 分支与提交，没有配置 remote，没有执行远程 push。所谓“本地推送”按“保存本地 commit”处理；没有再创建重复的本地 bare 仓库。
-- GitHub Pages、Cloudflare Pages 和自动部署等待用户确认。当前不创建 workflow、不绑定账号、不读取部署凭据。
-- 确认后先核实模型授权，再选择托管平台和公开仓库策略；只发布 `dist/`，不要发布源资产或缓存。
+- GitHub Pages 使用 `.github/workflows/deploy-pages.yml`，Cloudflare Pages 使用 Git 集成；两者都从 `main` 构建 `dist/`，不会把部署凭据写入仓库。
+- 模型和图片均标注来源；如权利人认为使用不当，请通过本项目仓库 Issue 联系我，我会及时删除相关内容。公开部署时只发布 `dist/`，不要发布源资产或缓存。
 
 可继续优化：按图层拆独立 GLB 做按需加载、再测试纹理编码方案、给移动端增加分级细节。但当前图层开关只控制绘制，**不会减少初次整份 GLB 的下载，也不立即释放 GPU 内存**。

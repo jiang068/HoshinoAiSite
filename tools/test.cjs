@@ -1,6 +1,6 @@
 const {chromium}=require('playwright');
 const path=require('node:path');const fs=require('node:fs');const assert=require('node:assert/strict');
-const root=path.resolve(__dirname,'..');const base=process.env.VIEWER_URL||'http://127.0.0.1:8010/';
+const root=path.resolve(__dirname,'..');const base=process.argv[2]||process.env.VIEWER_URL||'http://127.0.0.1:8010/';
 (async()=>{
  fs.mkdirSync(path.join(root,'.cache/temp'),{recursive:true});
  const context=await chromium.launchPersistentContext(path.join(root,'.cache/test-browser'),{executablePath:process.env.EDGE_PATH||'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true,env:{...process.env,TEMP:path.join(root,'.cache/temp'),TMP:path.join(root,'.cache/temp')},viewport:{width:1440,height:1000}});
@@ -9,7 +9,7 @@ const root=path.resolve(__dirname,'..');const base=process.env.VIEWER_URL||'http
   const page=await context.newPage();page.on('pageerror',e=>results.errors.push(e.message));
   page.on('console',m=>{if(m.type()==='error')results.errors.push(m.text());});
   page.on('request',r=>{if(/^https?:/.test(r.url())&&!r.url().startsWith(base))results.externalRequests.push(r.url());});
-  await page.goto(base);await page.waitForFunction(()=>!!window.viewer,{timeout:60000});await page.waitForTimeout(500);
+  await page.goto(base+'gallery.html');await page.waitForFunction(()=>!!window.viewer,{timeout:60000});await page.waitForTimeout(500);
   await page.screenshot({path:path.join(root,'.cache/front.png')});
   results.checks.groups=await page.evaluate(()=>Object.fromEntries(Object.entries(viewer.groups).map(([k,v])=>[k,v.length])));
   for(const key of Object.keys(results.checks.groups)){

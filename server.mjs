@@ -5,7 +5,7 @@ import {join,extname} from 'node:path';
 const root=fileURLToPath(new URL(process.argv[3]==='--dist'?'./dist/':'.',import.meta.url));
 const port=Number(process.argv[2]||8010);
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.glb':'model/gltf-binary','.wasm':'application/wasm','.json':'application/json; charset=utf-8','.md':'text/plain; charset=utf-8'};
-const publicRoots=new Set(['index.html','main.js','styles.css','README.md','ATTRIBUTION.md','assets','vendor']);
+const publicRoots=new Set(['index.html','main.js','stage.js','styles.css','gallery.html','gallery.js','gallery.css','README.md','ATTRIBUTION.md','docs','assets','vendor']);
 http.createServer(async(req,res)=>{
  try{
   if(!['GET','HEAD'].includes(req.method)){res.writeHead(405);res.end();return;}

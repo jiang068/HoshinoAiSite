@@ -1,56 +1,33 @@
-import * as THREE from 'three';
-import {OrbitControls} from './vendor/three/examples/jsm/controls/OrbitControls.js';
-import {GLTFLoader} from './vendor/three/examples/jsm/loaders/GLTFLoader.js';
-import {DRACOLoader} from './vendor/three/examples/jsm/loaders/DRACOLoader.js';
-
-const LAYERS={character:['人物','原精度'],stage:['舞台与屏幕','保留构图'],rig:['支架与灯具','简化'],confetti:['礼花碎片','独立网格'],props:['兔子与装饰道具','简化'],effects:['透明特效','Alpha'],venue:['外围场馆','低精度']};
-const PRESETS={front:{label:'正面全身',p:[0,2.95,3.9],t:[0,2.85,.2]},portrait:{label:'面部特写',p:[.06,3.28,1.25],t:[.01,3.25,.22]},left:{label:'左前侧',p:[-2.5,3.1,2.9],t:[0,2.85,.1]},right:{label:'右前侧',p:[2.5,3.1,2.9],t:[0,2.85,.1]},back:{label:'背面细节',p:[0,3,-2.8],t:[0,2.85,.1]},wide:{label:'舞台全景',p:[0,5.1,11],t:[0,3,-1.6]},high:{label:'俯视舞台',p:[3,8.5,5.5],t:[0,2.5,-.5]}};
+import {Stage} from './stage.js';
 const $=s=>document.querySelector(s);
-const scene=new THREE.Scene();scene.background=new THREE.Color(0x15121e);
-const camera=new THREE.PerspectiveCamera(36,1,.01,200);
-const groups=Object.fromEntries(Object.keys(LAYERS).map(k=>[k,[]]));
-let renderer,controls,model;
-function fail(error){console.error(error);$('#loading').classList.remove('hidden');$('#loading h2').textContent='无法载入模型';$('#progress').textContent='请使用本地服务器，并确认浏览器支持 WebGL 2。';$('#bar').hidden=true;$('#status').textContent='加载失败';}
-function setLayer(key,visible){for(const obj of groups[key])obj.visible=visible;$(`#layer-${key}`).checked=visible;}
-function preset(key){
-  const {p,t}=PRESETS[key];
-  // Flush damping before an exact reset. Narrow screens pull back to avoid cropping.
-  controls.enableDamping=false;controls.update();
-  controls.target.set(...t);camera.position.set(...p);
-  camera.position.sub(controls.target).multiplyScalar(Math.max(1,.9/camera.aspect)).add(controls.target);
-  controls.update();controls.enableDamping=true;
-  document.querySelectorAll('[data-camera]').forEach(b=>{b.classList.toggle('active',b.dataset.camera===key);b.setAttribute('aria-pressed',String(b.dataset.camera===key));});
-}
-function resize(){const v=$('#viewport');camera.aspect=v.clientWidth/v.clientHeight;camera.updateProjectionMatrix();renderer.setSize(v.clientWidth,v.clientHeight,false);}
-async function start(){
-  renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;
-  $('#viewport').append(renderer.domElement);
-  controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.screenSpacePanning=true;controls.minDistance=.08;controls.maxDistance=60;
-  controls.mouseButtons={LEFT:THREE.MOUSE.ROTATE,MIDDLE:THREE.MOUSE.DOLLY,RIGHT:THREE.MOUSE.PAN};
-  renderer.domElement.addEventListener('contextmenu',e=>e.preventDefault());
-  for(const [key,[name,note]] of Object.entries(LAYERS)){
-    const label=document.createElement('label');label.className='layer';label.innerHTML=`<input id="layer-${key}" type="checkbox" checked><span>${name}</span><small>${note}</small>`;
-    label.querySelector('input').onchange=e=>setLayer(key,e.target.checked);$('#layer-list').append(label);
-  }
-  for(const [key,value] of Object.entries(PRESETS)){
-    const button=document.createElement('button');button.textContent=value.label;button.dataset.camera=key;button.onclick=()=>preset(key);$('#camera-list').append(button);
-  }
-  $('#all').onclick=()=>Object.keys(groups).forEach(k=>setLayer(k,true));
-  $('#solo').onclick=()=>{Object.keys(groups).forEach(k=>setLayer(k,k==='character'));preset('front');};
-  $('#reset').onclick=()=>preset('front');window.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='r'&&!e.ctrlKey&&!e.metaKey)preset('front');});
-  resize();preset('front');new ResizeObserver(()=>{resize();}).observe($('#viewport'));
-  renderer.setAnimationLoop(()=>{controls.update();renderer.render(scene,camera);});
-  const draco=new DRACOLoader().setDecoderPath('./vendor/three/examples/jsm/libs/draco/gltf/');
-  try{
-    const gltf=await new GLTFLoader().setDRACOLoader(draco).loadAsync('./assets/hoshino.glb',e=>{
-      const percent=e.total?100*e.loaded/e.total:0;$('#bar').value=percent;$('#progress').textContent=`${(e.loaded/1e6).toFixed(2)} MB · ${percent>=100?'解码模型…':Math.round(percent)+'%'}`;
-    });
-    model=gltf.scene;scene.add(model);
-    model.traverse(o=>{if(!o.isMesh)return;const key=o.userData.viewerGroup;if(!groups[key])throw new Error(`Unknown model group: ${key}`);groups[key].push(o);if(o.material.transparent)o.material.depthWrite=false;});
-    for(const k of Object.keys(groups))if(!groups[k].length)throw new Error(`Missing model group: ${k}`);
-    $('#layers').disabled=false;$('#cameras').disabled=false;$('#loading').classList.add('hidden');$('#status').textContent='● 已就绪';
-    window.viewer={scene,camera,controls,renderer,model,groups,preset,setLayer,PRESETS};
-    const response=await fetch('./assets/optimization-report.json');if(response.ok){const r=await response.json();$('#stats').textContent=`GLB ${(r.glb_bytes/1e6).toFixed(2)} MB · ${r.export_triangles.toLocaleString()} 三角面 · 减少 ${r.saved_percent}% 体积`;}
-  }finally{draco.dispose();}
-}
-start().catch(fail);
+const chapters=[['opening','入场 · OPENING','sakura'],['profile','唯一 · THE ONE','sakura'],['cheer','应援 · YOUR LIGHT','aurora'],['lights','灯光 · DIRECTOR','sakura'],['backstage','幕后 · BACKSTAGE','night'],['secret','秘密 · LETTER','night'],['encore','安可 · ENCORE','gold']];
+let index=0,count=0,color='#ff7abf',stage,orbit=false,audio,master,sound=false;
+const preference=matchMedia('(prefers-reduced-motion: reduce)');
+$('#reduce-motion').checked=preference.matches;
+const reduced=()=>$('#reduce-motion').checked;
+function motion(){document.body.classList.toggle('reduced',reduced());if(stage){stage.reduced=reduced();stage.motion=$('#motion').checked;}}
+function mood(name){document.body.dataset.light=name;$('#scene-mode').textContent=name.toUpperCase()+' / LIVE STAGE';stage?.mood(name);document.querySelectorAll('[data-light]').forEach(b=>{b.classList.toggle('selected',b.dataset.light===name);b.setAttribute('aria-pressed',String(b.dataset.light===name));});}
+function free(value){orbit=value;document.body.classList.toggle('orbiting',orbit);$('#orbit-toggle').setAttribute('aria-pressed',String(orbit));$('#orbit-toggle').innerHTML=orbit?'退出自由取景 ×':'自由取景 ↗';if(stage)stage.controls.enabled=orbit;}
+function goTo(n,focus=false){n=Math.max(0,Math.min(6,n));free(false);index=n;document.querySelectorAll('.chapter').forEach((s,i)=>{s.hidden=i!==n;s.inert=i!==n;s.classList.toggle('active',i===n);s.classList.toggle('entering',i===n);if(i===n)s.scrollTop=0;});document.body.dataset.chapter=n;$('#current-number').textContent=String(n+1).padStart(2,'0');$('#current-name').textContent=chapters[n][1];$('#previous').disabled=n===0;$('#next').disabled=n===6;$('#chapter-progress').style.width=((n+1)/7*100)+'%';document.querySelectorAll('#chapter-dots button').forEach((b,i)=>{b.classList.toggle('active',i===n);if(i===n)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');});history.replaceState(null,'','#'+chapters[n][0]);$('#announcement').textContent=`第 ${n+1} 幕：${chapters[n][1]}`;mood(chapters[n][2]);stage?.shot(n);if(focus){const h=$('#title-'+n);h.tabIndex=-1;h.focus({preventScroll:true});}}
+chapters.forEach((c,i)=>{const b=document.createElement('button');b.setAttribute('aria-label',`第 ${i+1} 幕 ${c[1]}`);b.innerHTML=`<span>${String(i+1).padStart(2,'0')}</span>`;b.onclick=()=>goTo(i);$('#chapter-dots').append(b);});
+document.querySelectorAll('[data-goto]').forEach(b=>b.onclick=()=>goTo(+b.dataset.goto));
+$('#previous').onclick=()=>goTo(index-1);$('#next').onclick=()=>goTo(index+1);
+window.addEventListener('hashchange',()=>{const n=chapters.findIndex(c=>'#'+c[0]===location.hash);if(n>=0)goTo(n);});
+document.addEventListener('keydown',e=>{if($('dialog[open]')||orbit||e.target.closest('input,select,textarea,button,a'))return;const d=['ArrowDown','ArrowRight','PageDown'].includes(e.key)?1:['ArrowUp','ArrowLeft','PageUp'].includes(e.key)?-1:0;if(d){e.preventDefault();goTo(index+d,true);}});
+let wheel=0,lastWheel=0;
+window.addEventListener('wheel',e=>{if(orbit||$('dialog[open]')||e.ctrlKey)return;const section=e.target.closest('.chapter');if(section&&section.scrollHeight>section.clientHeight+2){if((e.deltaY>0&&section.scrollTop+section.clientHeight<section.scrollHeight-2)||(e.deltaY<0&&section.scrollTop>0))return;}e.preventDefault();if(performance.now()-lastWheel<1100)return;wheel+=e.deltaY;if(Math.abs(wheel)>90){goTo(index+Math.sign(wheel));wheel=0;lastWheel=performance.now();}},{passive:false});
+let touch=null;window.addEventListener('touchstart',e=>{if(!e.target.closest('button,a,input,select,.chapter')&&!orbit)touch=e.touches[0].clientY;else touch=null;},{passive:true});window.addEventListener('touchend',e=>{if(touch!==null&&!$('dialog[open]')){const delta=touch-e.changedTouches[0].clientY;if(Math.abs(delta)>65)goTo(index+Math.sign(delta));}touch=null;},{passive:true});
+for(const id of ['settings','credits'])$('#'+id+'-open').onclick=()=>$('#'+id).showModal();
+$('#motion').onchange=motion;$('#reduce-motion').onchange=()=>{motion();stage?.shot(index,true);};preference.addEventListener('change',e=>{$('#reduce-motion').checked=e.matches;motion();stage?.shot(index,true);});
+$('#quality').onchange=e=>stage?.quality(e.target.value);$('#orbit-toggle').onclick=()=>free(!orbit);
+document.querySelectorAll('[data-light]').forEach(b=>b.onclick=()=>mood(b.dataset.light));
+document.querySelectorAll('[data-color]').forEach(b=>b.onclick=()=>{color=b.dataset.color;document.querySelectorAll('[data-color]').forEach(x=>{x.classList.toggle('selected',x===b);x.setAttribute('aria-pressed',String(x===b));});stage?.cheer(color);});
+function cheer(){count++;$('#cheer-count').textContent=String(count).padStart(2,'0');$('#cheer-feedback').textContent=`你的第 ${count} 次应援，已点亮。`;stage?.cheer(color);if(!reduced()){for(let i=0;i<7;i++){if($('#reactions').children.length>42)break;const s=document.createElement('span');s.className='reaction';s.textContent=i%2?'✧':'✦';s.style.cssText=`left:${30+Math.random()*60}%;top:${45+Math.random()*40}%;color:${color};--drift:${Math.random()*140-70}px`;$('#reactions').append(s);setTimeout(()=>s.remove(),1800);}}if(sound&&audio?.state==='running'){const o=audio.createOscillator(),g=audio.createGain();o.frequency.value=660+count%3*110;g.gain.setValueAtTime(.035,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.7);o.connect(g).connect(master);o.start();o.stop(audio.currentTime+.8);}}
+for(const id of ['cheer-button','hero-cheer','encore-cheer'])$('#'+id).onclick=cheer;
+$('#letter').onclick=()=>{const open=$('#letter').getAttribute('aria-expanded')!=='true';$('#letter').setAttribute('aria-expanded',String(open));$('#letter-message').hidden=!open;$('#letter-hint').textContent=open?'信已展开 · 再次点击收起':'点击拆开这封信';};
+$('#sound').onclick=async()=>{try{if(!audio){audio=new AudioContext();master=audio.createGain();master.gain.value=0;master.connect(audio.destination);[130.81,196,261.63].forEach((f,i)=>{const o=audio.createOscillator(),g=audio.createGain();o.type='sine';o.frequency.value=f;o.detune.value=i*3;g.gain.value=.12;o.connect(g).connect(master);o.start();});}sound=!sound;await audio.resume();master.gain.cancelScheduledValues(audio.currentTime);master.gain.setTargetAtTime(sound?.23:0,audio.currentTime,.3);$('#sound').setAttribute('aria-pressed',String(sound));$('#sound span').textContent=sound?'声音开':'声音关';}catch{$('#sound span').textContent='声音不可用';}};
+document.addEventListener('visibilitychange',()=>{if(audio){if(document.hidden)audio.suspend();else if(sound)audio.resume().catch(()=>{});}});
+$('#retry').onclick=()=>location.reload();
+goTo(Math.max(0,chapters.findIndex(c=>'#'+c[0]===location.hash)));motion();
+window.experience={goTo,get index(){return index;},get stage(){return stage;},get count(){return count;},get sound(){return sound;}};
+try{stage=new Stage($('#viewport'));motion();stage.shot(index,true);await stage.load(p=>{$('#load-text').textContent=p;});mood(chapters[index][2]);$('#loading-status').hidden=true;}catch(e){console.error('Stage unavailable:',e);$('#load-text').textContent='3D 舞台暂不可用，仍可浏览全部章节';$('#retry').hidden=false;$('#loading-status').classList.add('failed');}

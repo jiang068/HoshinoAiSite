@@ -3,6 +3,19 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "scripts": {"start":"node server.mjs", "test":"node tools/test-experience.cjs", "test:gallery":"node tools/test.cjs", "build":"node tools/package.mjs"},
-  "engines":{"node":">=20"}
+  "scripts": {
+    "start": "node server.mjs",
+    "start:dist": "node server.mjs 8010 --dist",
+    "dev": "vite",
+    "test": "node tools/test-experience.cjs",
+    "test:gallery": "node tools/test.cjs",
+    "build": "vite build"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "vite": "^8.3.0"
+  }
 }

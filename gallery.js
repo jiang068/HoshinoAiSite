@@ -40,7 +40,8 @@ async function start(){
   $('#reset').onclick=()=>preset('front');window.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='r'&&!e.ctrlKey&&!e.metaKey)preset('front');});
   resize();preset('front');new ResizeObserver(()=>{resize();}).observe($('#viewport'));
   renderer.setAnimationLoop(()=>{controls.update();renderer.render(scene,camera);});
-  const draco=new DRACOLoader().setDecoderPath('./vendor/three/examples/jsm/libs/draco/gltf/');
+  const decoderPath=new URL('./vendor/three/examples/jsm/libs/draco/gltf/',document.baseURI).href;
+  const draco=new DRACOLoader().setDecoderPath(decoderPath);
   try{
     const gltf=await new GLTFLoader().setDRACOLoader(draco).loadAsync('./assets/hoshino.glb',e=>{
       const percent=e.total?100*e.loaded/e.total:0;$('#bar').value=percent;$('#progress').textContent=`${(e.loaded/1e6).toFixed(2)} MB · ${percent>=100?'解码模型…':Math.round(percent)+'%'}`;

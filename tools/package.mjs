@@ -1,10 +1,8 @@
-// Make a static-only output. Never include original sources, Git or caches.
-import {mkdir,cp} from 'node:fs/promises';
+// Compatibility entry point for the old command. The production build now lives in vite.config.mjs.
+import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {join} from 'node:path';
 const root=fileURLToPath(new URL('..',import.meta.url));
-const out=join(root,'dist');await mkdir(out,{recursive:true});
-for(const file of ['index.html','main.js','stage.js','styles.css','gallery.html','gallery.js','gallery.css','README.md','ATTRIBUTION.md','docs','vendor'])await cp(join(root,file),join(out,file),{recursive:true});
-await mkdir(join(out,'assets'),{recursive:true});
-for(const file of ['hoshino.glb','optimization-report.json','official-ai-character.png','official-ai-newyear.jpg','official-ai-valentine.jpg','official-ai-song-vol1.jpg','official-ai-stage.jpg','official-ai-casual.jpg','official-ai-closeup.jpg','official-ai-dark.jpg','official-ai-idol-banner.jpg'])await cp(join(root,'assets',file),join(out,'assets',file));
-console.log('Static site prepared in dist/; no deployment performed.');
+const vite=join(root,'node_modules','vite','bin','vite.js');
+const child=spawn(process.execPath,[vite,'build'],{cwd:root,stdio:'inherit'});
+child.on('exit',code=>process.exit(code??1));

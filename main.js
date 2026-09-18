@@ -1,4 +1,3 @@
-import {Stage} from './stage.js';
 const $=s=>document.querySelector(s);
 const chapters=[['opening','入场 · OPENING','sakura'],['profile','唯一 · THE ONE','sakura'],['cheer','应援 · YOUR LIGHT','aurora'],['lights','灯光 · DIRECTOR','sakura'],['backstage','幕后 · BACKSTAGE','night'],['secret','秘密 · LETTER','night'],['encore','安可 · ENCORE','gold']];
 let index=0,count=0,color='#ff7abf',stage,orbit=false,audio,master,sound=false;
@@ -30,4 +29,5 @@ document.addEventListener('visibilitychange',()=>{if(audio){if(document.hidden)a
 $('#retry').onclick=()=>location.reload();
 goTo(Math.max(0,chapters.findIndex(c=>'#'+c[0]===location.hash)));motion();
 window.experience={goTo,get index(){return index;},get stage(){return stage;},get count(){return count;},get sound(){return sound;}};
-try{stage=new Stage($('#viewport'));motion();stage.shot(index,true);await stage.load(p=>{$('#load-text').textContent=p;});mood(chapters[index][2]);$('#loading-status').hidden=true;}catch(e){console.error('Stage unavailable:',e);$('#load-text').textContent='3D 舞台暂不可用，仍可浏览全部章节';$('#retry').hidden=false;$('#loading-status').classList.add('failed');}
+async function loadStage(){try{const {Stage}=await import('./stage.js');stage=new Stage($('#viewport'));motion();stage.shot(index,true);await stage.load(p=>{$('#load-text').textContent=p;});mood(chapters[index][2]);$('#loading-status').hidden=true;}catch(e){console.error('Stage unavailable:',e);$('#load-text').textContent='3D 舞台暂不可用，仍可浏览全部章节';$('#retry').hidden=false;$('#loading-status').classList.add('failed');}}
+loadStage();

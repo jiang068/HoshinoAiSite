@@ -43,20 +43,20 @@ hoshino-viewer/
   assets/hoshino.glb                  分组后模型和内嵌贴图
   assets/official-ai-*                动画官网角色/节日视觉与角色歌封面
   assets/optimization-report.json     实测数据、输入文件 SHA-256
-  vendor/three/                      仅运行需要的模块和本地 Draco 解码器
+  vendor/three/                      构建输入、许可证与本地 Draco 解码器
+  vite.config.mjs                    生产构建、Tree Shaking、静态资源清单
   tools/build-model.py               Blender 转换脚本
   tools/convert.ps1                  本地缓存隔离与转换入口
   tools/analyze.py                   可选的原始连通网格分析
   tools/test-experience.cjs          应援站端到端验收
   tools/test.cjs                     模型展厅端到端验收
-  tools/package.mjs                  静态发布目录生成器
   docs/SOURCES.md                     官网事实与原创内容边界
   docs/validation.json               本次模型展厅测试记录
   server.mjs                        本地只读静态服务
   README.md / ATTRIBUTION.md         教程与来源
 ```
 
-不把原 OBJ/MTL、ZIP、完整 node_modules、缓存或 Blender 中间文件提交到 Git。运行所需 Three.js 文件已精选到 vendor，并保留第三方许可证。原始资产留在上一级指定文件夹，仓库里只有优化结果与可复现工具。
+不把原 OBJ/MTL、ZIP、完整 node_modules、缓存或 Blender 中间文件提交到 Git。Three.js 源模块留在 vendor 作为构建输入，并保留第三方许可证；生产 `dist/` 只输出压缩后的业务 bundle、图片、模型、Draco 解码器和说明文件。
 
 生成独立静态目录：
 
@@ -64,7 +64,15 @@ hoshino-viewer/
 npm run build
 ```
 
-输出 `dist/`，只复制网页、GLB、报告、必要库和说明文件。所有网页资源均用相对路径，便于以后部署到子目录。此命令**不会联网发布**，也不创建 GitHub Actions 或 Cloudflare 配置。
+输出 `dist/`，会先清空旧产物，再通过 Vite 完成 HTML/CSS/JS 压缩、Three.js Tree Shaking、内容 hash 和动态 chunk 拆分。首屏只加载应援页业务代码，Three.js 舞台在页面可用后按需加载；图片、模型和 Draco 文件作为静态资源保留。此命令**不会联网发布**，也不创建 GitHub Actions 或 Cloudflare 配置。
+
+开发预览使用 `npm run dev`；检查生产产物使用：
+
+```powershell
+node server.mjs 8011 --dist
+```
+
+只读服务器会对 HTML、JS、CSS、JSON 和 Markdown 自动使用 Brotli/gzip，并对内容 hash 的 bundle 设置长期缓存；模型和图片不会被重复压缩。
 
 可用 `node server.mjs 8011 --dist` 独立预览发布目录，确认它不依赖父目录的模型或 node_modules。
 

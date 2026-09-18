@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#11101c"><title>星野爱 · 舞台模型实验室</title>
+  <link rel="icon" href="data:,"><link rel="stylesheet" href="./styles.css">
+  <script type="importmap">{"imports":{"three":"./vendor/three/build/three.module.js"}}</script>
+</head>
+<body>
+  <main>
+    <section class="stage" aria-label="三维模型展示">
+      <div id="viewport"></div>
+      <div class="top"><span>OSHI NO KO <b> / </b> MODEL LAB</span><span id="status" role="status">正在加载…</span></div>
+      <div id="loading" class="loading"><div class="star">✦</div><h2>舞台准备中</h2><p id="progress">加载本地 GLB 与纹理</p><progress id="bar" max="100" value="0"></progress></div>
+      <div class="bottom"><div><small>推しの子 · HOSHINO AI</small><h1>星野爱</h1></div><button id="reset">正面视角 <kbd>R</kbd></button></div>
+    </section>
+    <aside>
+      <header><span class="badge">AI</span><div><small>INTERACTIVE VIEWER</small><h2>你的舞台，你来取景</h2></div></header>
+      <p class="intro">保留人物细节，轻量呈现完整场景。自由组合显示层，探索不同机位。</p>
+      <fieldset id="layers" disabled><legend>01 / 场景图层</legend><div id="layer-list"></div><div class="actions"><button id="all">全部显示</button><button id="solo">只看人物</button></div></fieldset>
+      <fieldset id="cameras" disabled><legend>02 / 摄像机预设</legend><div id="camera-list"></div></fieldset>
+      <div class="help"><span>左键 · 旋转</span><span>右键 · 平移</span><span>滚轮 · 缩放</span><small>触屏：单指旋转 / 双指缩放与平移</small></div>
+      <p class="stats" id="stats">GLB · Draco · 本地资源</p>
+      <footer>原模型：<a href="https://sketchfab.com/models/20103e3eccd8433fbc7ebf7bd193143f/" target="_blank" rel="noopener noreferrer">推しの子 - アイ / Sketchfab ↗</a><br>模型与贴图版权属于原权利人。本页提供技术优化与展示，不重新授予模型许可。<br><a href="./README.md">优化教程与项目说明</a></footer>
+    </aside>
+  </main>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

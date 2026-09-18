@@ -1,0 +1,189 @@
+# 星野爱 · 轻量化模型展示实验室
+
+一个可直接运行的静态 Three.js 网站：把指定的 21 个 OBJ 分块重组为 7 个可独立开关的场景图层，保留人物细节，再用 Blender 导出压缩 GLB。无需 CDN、后端框架、在线模型服务或网页构建依赖。
+
+**原模型出处：[推しの子 - アイ / Sketchfab](https://sketchfab.com/models/20103e3eccd8433fbc7ebf7bd193143f/)**。网页页脚也保留了来源。模型和贴图不是本项目原创，公开发布前必须核实原作者与许可证，详见 [ATTRIBUTION.md](ATTRIBUTION.md)。
+
+## 1. 运行与操作
+
+需要现有 Node.js 20+。在本目录执行：
+
+```powershell
+.\start-server.ps1
+# 或 node server.mjs 8010
+```
+
+浏览地址：`http://127.0.0.1:8010/`。需要把浏览器缓存也放在本项目时，另开终端执行：
+
+```powershell
+.\open-viewer.ps1
+```
+
+该脚本使用已安装的 Edge，并指定 `.cache/viewer-browser` 为独立用户目录及磁盘缓存位置。普通浏览器直接打开 URL 时仍使用它自己的用户配置。服务只绑定本机，Ctrl+C 停止；不要直接双击 HTML。
+
+- 左键拖动旋转，右键拖动平移，滚轮缩放；R 或「正面视角」重置镜头。
+- 7 个图层：人物、舞台与屏幕、支架与灯具、礼花碎片、兔子与装饰道具、透明特效、外围场馆。
+- 「只看人物」隐藏所有其他层；「全部显示」恢复场景。图层开关不改变模型的位置或比例。
+- 7 个机位：正面全身、面部特写、左前侧、右前侧、背面细节、舞台全景、俯视舞台。
+- 默认镜头在人物正前方、场馆内部。触屏支持单指旋转、双指平移与缩放。
+
+## 2. 目录与精简分发
+
+```text
+hoshino-viewer/
+  index.html / main.js / styles.css   网页
+  assets/hoshino.glb                  分组后模型和内嵌贴图
+  assets/optimization-report.json     实测数据、输入文件 SHA-256
+  vendor/three/                      仅运行需要的模块和本地 Draco 解码器
+  tools/build-model.py               Blender 转换脚本
+  tools/convert.ps1                  本地缓存隔离与转换入口
+  tools/analyze.py                   可选的原始连通网格分析
+  tools/test.cjs                     浏览器验收测试
+  tools/package.mjs                  静态发布目录生成器
+  docs/validation.json               本次测试记录
+  server.mjs                        本地只读静态服务
+  README.md / ATTRIBUTION.md         教程与来源
+```
+
+不把原 OBJ/MTL、ZIP、完整 node_modules、缓存或 Blender 中间文件提交到 Git。运行所需 Three.js 文件已精选到 vendor，并保留第三方许可证。原始资产留在上一级指定文件夹，仓库里只有优化结果与可复现工具。
+
+生成独立静态目录：
+
+```powershell
+npm run build
+```
+
+输出 `dist/`，只复制网页、GLB、报告、必要库和说明文件。所有网页资源均用相对路径，便于以后部署到子目录。此命令**不会联网发布**，也不创建 GitHub Actions 或 Cloudflare 配置。
+
+可用 `node server.mjs 8011 --dist` 独立预览发布目录，确认它不依赖父目录的模型或 node_modules。
+
+## 3. 优化前后：实测而不是估计
+
+本次工具版本：Blender 5.2.2 LTS、Three.js 0.186.0。MB 按 1,000,000 字节计算。
+
+| 指标 | 输入/优化前 | 最终输出 |
+| --- | ---: | ---: |
+| OBJ + MTL + PNG 总字节 | 243,805,840 | — |
+| GLB，包含纹理与 Draco 几何 | — | 5,206,968（5.21 MB） |
+| Blender 导入后的三角面 | 1,167,257 | — |
+| 清理后的三角面 | 1,167,014 | — |
+| 最终三角面 | — | 510,574 |
+| 模型传输体积减少 | — | 97.86% |
+
+三角面减少约 56.26%。输入面数按 Blender 导入后的有效面三角化计算，不是原 OBJ 的 `f` 行数；导入器已经过滤了一些无效输入。5.21 MB 仅指 GLB，不包含网页 JS/WASM，不能宣称整个页面只下载 5.21 MB。首次访问还要下载本地 Three.js 与 Draco 解码器。
+
+| 图层 | 清理后 | 最终 | 目标保留比例 |
+| --- | ---: | ---: | ---: |
+| 人物 | 217,136 | 217,136 | 100% |
+| 舞台与屏幕 | 1,337 | 1,337 | 100% |
+| 支架与灯具 | 175,892 | 60,785 | 35% |
+| 礼花碎片 | 205,603 | 123,299 | 60% |
+| 兔子与装饰道具 | 519,025 | 93,423 | 18% |
+| 透明特效 | 45,268 | 13,494 | 30% |
+| 外围场馆 | 2,753 | 1,100 | 40% |
+
+相比前一版不分图层的 4.91 MB，这版约 5.21 MB：不是单纯追求最小文件，而是保留更完整的舞台轮廓、礼花形状以及可独立控制的结构。人物层不减面，但合点和 Draco 量化意味着整个处理链不是严格数学无损。
+
+## 4. 手把手：从原始 OBJ 到网页 GLB
+
+### 第一步：保留原件，先做资产盘点
+
+把原模型放在独立源目录。默认源目录为仓库的兄弟目录 `推しの子 - アイ _ Oshino Ko - Hoshino Ai`。脚本核对 21 个 OBJ，并记录输入 OBJ/MTL/PNG 的大小与 SHA-256，便于以后确认输入是否一致。
+
+不要按文件名猜测内容。这个模型按材质及顶点数量拆块，`UV01_1` 等并非语义化的人物部件。盲目隐藏一个 OBJ，会同时丢掉人物的一部分与场景的一部分。
+
+### 第二步：统一坐标和材质来源
+
+Blender OBJ 导入参数为 `forward_axis='NEGATIVE_Z', up_axis='Y'`。原始 OBJ 坐标 `(x,y,z)` 对应 Blender `(x,-z,y)`，所以脚本中的高度是 Blender Z。导出 glTF 时再由导出器转换成网页 Y-up。
+
+先按实际使用的纹理合并 OBJ 分块，跨文件恢复连通部件。保留 UV 的每个面角数据，不重新展开 UV、不移动角色、不单独缩放道具。原模型中一对非常接近的壳面可能是卡通描边，而不是多余副本，因此不做粗暴的近距离重复壳删除。
+
+### 第三步：清理无效几何，阈值要小
+
+`bmesh.ops.remove_doubles(..., dist=1e-6)` 合并极近顶点；`dissolve_degenerate(..., dist=1e-7)` 清理退化边面；删除不属于任何面的孤立顶点。这里单位是模型坐标单位，不能机械地套用到所有模型。
+
+焊点可能影响法线或拓扑，操作后必须检查眼睛、头发、薄片、描边与 UV。保留原件和参数，发现损坏时缩小阈值或跳过该操作。
+
+### 第四步：连通部件 + 空间 + 邻近关系分组
+
+遍历 BMesh 顶点，通过边做深度优先搜索，得到连通部件。每个部件记录包围盒、顶点数、面数、纹理来源。整个部件归组，不用平面直接切穿人物。
+
+本模型的分类规则在 `build-model.py` 的 `classify()` 和 `character_bounds()` 中：
+
+1. 人物贴图组内，以中心人物包围范围中的大部件作为种子。
+2. 用 KDTree 查询其余部件到种子顶点的距离，以 0.025 模型单位的阈值迭代扩展三轮，把独立发丝、蝴蝶结、发饰和衣服细节归入人物。
+3. 其余小尺寸、低面数部件归礼花；更大的部件归兔子和装饰道具。
+4. UV01 场景贴图归舞台与屏幕；UV02 归支架灯具，超大外围部件单独归场馆；Alpha 贴图归透明特效。
+
+**这是针对本资产调校的启发式，不是通用智能识别。** 礼花组可能包含其他同尺寸装饰小片，支架组也包含灯具及附属结构。若更换模型，要重新检查包围盒和归类，不能直接复制数值。首次空间分类曾误收附近礼花；只看人物的截图帮助发现问题，加入邻近关系后再复查发饰是否完整。
+
+每组导出对象写入 `piece['viewerGroup']=group`，使用 `export_extras=True`，网页从 `object.userData.viewerGroup` 读组名，不再依赖易变的对象编号。
+
+### 第五步：按视觉重要性减面，不要全场统一比例
+
+Blender Decimate 使用各组独立比例，见上表与脚本 `RATIOS`。人物和本来已很低面的舞台不减面，外围道具降低到 18%，礼花保留 60% 以避免碎片消失。应用修改器后调用 `mesh.validate()`，最后统计实际结果；拓扑约束和无效面修复会让实际面数不完全等于目标比例。
+
+学习时可以先从 80% 开始，再逐渐降低，分别观察正面、背面、特写、剪影以及分组单独显示。减少文件大小不应以面部损坏为代价。
+
+### 第六步：优化纹理并正确恢复透明
+
+- 人物图集 1024×1024 保留原尺寸。
+- 舞台主屏 2048×2048 保留，避免屏幕图案糊掉。
+- 次要 UV02 场景图集由 1024×1024 降到 512×512。
+- 透明贴图保留 PNG Alpha，通过 Principled BSDF 的 Alpha 输入输出到 glTF。不要把黑色贴图强行当不透明色块，也不要未经验证用 RGB 亮度代替 Alpha。
+
+图集有已绘制的颜色与明暗，本例使用黑色 Base Color + 纹理 Emission 来呈现，避免额外强灯光洗白贴图。网页为透明材质关闭 depthWrite，减少透明薄片的深度遮挡；复杂重叠透明物仍可能受实时排序限制。这不是一套通用写实 PBR 材质方案。
+
+### 第七步：GLB 封装 + Draco 编码
+
+核心导出选项：
+
+```python
+bpy.ops.export_scene.gltf(
+    filepath='hoshino.glb', export_format='GLB', export_extras=True,
+    export_draco_mesh_compression_enable=True,
+    export_draco_mesh_compression_level=6,
+    export_draco_position_quantization=16,
+    export_draco_normal_quantization=12,
+    export_draco_texcoord_quantization=14,
+)
+```
+
+GLB 将场景结构、几何、材质和 PNG 收在一个文件；Draco 压缩网格，不会替你压缩 PNG。16/12/14 位分别控制位置、法线与 UV 的量化精度，是精度与体积的权衡。本例不把压缩宣传成无损，也不只看文件大小：网页还需要 WASM 解码时间、CPU 内存、GPU 缓冲和纹理内存。
+
+网页使用 `GLTFLoader + DRACOLoader`，decoderPath 指向项目内的 `vendor/three/.../draco/gltf/`。GLB、WASM 的 MIME 分别设置为 `model/gltf-binary`、`application/wasm`。仓库附带所需解码器，不向 CDN 请求。
+
+### 第八步：一条命令复现
+
+```powershell
+.\tools\convert.ps1
+
+# 其他机器自定义 Blender 和源文件目录：
+.\tools\convert.ps1 -Blender 'D:\Apps\Blender\blender.exe' -Source 'D:\Models\原始模型'
+```
+
+转换约需几十秒，视机器而定。输出覆盖本仓库的 GLB 与报告，绝不写回原始目录。脚本不保存 .blend，以免触发系统缩略图写入。Blender 版本变化可能影响导出大小，应以新生成报告为准，不要求不同版本二进制逐字节一致。
+
+### 第九步：网页验收，不能只看导出成功
+
+服务器运行后，可选安装测试依赖（不影响网页运行）：
+
+```powershell
+npm install --no-save --package-lock=false --ignore-scripts --cache .npm-cache playwright@1.63.0
+npm test
+```
+
+测试使用现有 Edge，不运行浏览器下载命令。可通过 `EDGE_PATH` 指定浏览器可执行文件，通过 `VIEWER_URL` 指定测试服务地址（以 `/` 结尾）。本次在父项目现有 Playwright 上执行，未为网站复制完整测试依赖。
+
+验收包括：GLB 解码、7 组存在、逐组隐藏和恢复、只看人物、7 个机位坐标、左键旋转、右键平移、滚轮缩放、R 重置、390px 手机宽度、无外网资源请求、无控制台错误，以及服务器不暴露 `.git` 和 `.cache`。截图和运行报告输出到 `.cache`；本次报告副本在 `docs/validation.json`。最后还要人工看截图，检查人物、发饰、舞台轮廓和透明效果。
+
+## 5. 缓存、Git 与后续发布边界
+
+- `.cache` 保存 Blender 临时配置、浏览器独立用户数据、截图；`.npm-cache` 保存 npm 下载缓存，均在项目内部。
+- 转换和浏览器脚本只改当前进程环境变量，并在退出时恢复；不写系统环境、不安装全局包。
+- `.gitignore` 排除缓存、原 OBJ/MTL、ZIP、node_modules 和 dist。vendor 运行依赖及许可证纳入版本控制，保证克隆后可直接运行。
+- 当前只有本地 Git `main` 分支与提交，没有配置 remote，没有执行远程 push。所谓“本地推送”按“保存本地 commit”处理；没有再创建重复的本地 bare 仓库。
+- GitHub Pages、Cloudflare Pages 和自动部署等待用户确认。当前不创建 workflow、不绑定账号、不读取部署凭据。
+- 确认后先核实模型授权，再选择托管平台和公开仓库策略；只发布 `dist/`，不要发布源资产或缓存。
+
+可继续优化：按图层拆独立 GLB 做按需加载、再测试纹理编码方案、给移动端增加分级细节。但当前图层开关只控制绘制，**不会减少初次整份 GLB 的下载，也不立即释放 GPU 内存**。

@@ -1,0 +1,22 @@
+{
+  "date": "2026-09-18T06:11:41.664Z",
+  "checks": {
+    "groups": {
+      "character": 1,
+      "stage": 1,
+      "rig": 1,
+      "confetti": 1,
+      "props": 1,
+      "effects": 1,
+      "venue": 1
+    },
+    "layerToggles": true,
+    "solo": true,
+    "cameraPresets": 7,
+    "mouseAndReset": true,
+    "mobileNoOverflow": true,
+    "privatePathsBlocked": true
+  },
+  "errors": [],
+  "externalRequests": []
+}

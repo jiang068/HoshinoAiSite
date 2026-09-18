@@ -1,0 +1,296 @@
+{
+  "source_url": "https://sketchfab.com/models/20103e3eccd8433fbc7ebf7bd193143f/",
+  "source_directory": "推しの子 - アイ _ Oshino Ko - Hoshino Ai",
+  "blender": "5.2.2 LTS",
+  "ratios": {
+    "character": 1.0,
+    "stage": 1.0,
+    "rig": 0.35,
+    "confetti": 0.6,
+    "props": 0.18,
+    "effects": 0.3,
+    "venue": 0.4
+  },
+  "groups": {
+    "confetti": {
+      "before_triangles": 205603,
+      "after_triangles": 123299,
+      "components": 5509
+    },
+    "character": {
+      "before_triangles": 217136,
+      "after_triangles": 217136,
+      "components": 374
+    },
+    "props": {
+      "before_triangles": 519025,
+      "after_triangles": 93423,
+      "components": 1641
+    },
+    "stage": {
+      "before_triangles": 1337,
+      "after_triangles": 1337,
+      "components": 51
+    },
+    "rig": {
+      "before_triangles": 175892,
+      "after_triangles": 60785,
+      "components": 5346
+    },
+    "venue": {
+      "before_triangles": 2753,
+      "after_triangles": 1100,
+      "components": 10
+    },
+    "effects": {
+      "before_triangles": 45268,
+      "after_triangles": 13494,
+      "components": 342
+    }
+  },
+  "inputs": [
+    {
+      "name": "T_Alpha.tga.png",
+      "bytes": 70892,
+      "sha256": "af9ff2c226f02dc67414bc683dcf2f3a40e50564ea2e9067bdf6e18c1430c9d5"
+    },
+    {
+      "name": "T_Character_HoshinoAi.tga.png",
+      "bytes": 332137,
+      "sha256": "460b4d78da6171c26fadb6d7f95d640f154ebd796b9e2180ea81ce469ba72ae7"
+    },
+    {
+      "name": "UV01.mtl",
+      "bytes": 66,
+      "sha256": "a61ceb94b336e52db8a872c52df0d78afcc487740d8a8a06d3fe6ff2e1ac4420"
+    },
+    {
+      "name": "UV01.obj",
+      "bytes": 18571886,
+      "sha256": "18ae5a2d0e92444cee40884713750288e8dc13e3c9b03e0d1baa8ee6621e9744"
+    },
+    {
+      "name": "UV01.tga.png",
+      "bytes": 1605547,
+      "sha256": "beb08d27a6bd7113ddbb90acaa7076d86b8a670005b7cc742b09a60022ed0bf9"
+    },
+    {
+      "name": "UV01_1.mtl",
+      "bytes": 68,
+      "sha256": "6598ae7d196250b4dcd5e328f49da5e5d9ca689d22c12b334d0a7600e8d64d7c"
+    },
+    {
+      "name": "UV01_1.obj",
+      "bytes": 18908682,
+      "sha256": "fa7c9607126ac0072c108fd1790e3c191323e2cfc15a4c5191631a9c7f9c7855"
+    },
+    {
+      "name": "UV01_2.mtl",
+      "bytes": 68,
+      "sha256": "6c926403f316069416d2a66d04b606a834b9b2c0feef4bcc3e51775237aa36cd"
+    },
+    {
+      "name": "UV01_2.obj",
+      "bytes": 19061902,
+      "sha256": "bbb9d368b7a173651cd5d42727c9063b4737e8b742413f26f7ffca8d2e744c0a"
+    },
+    {
+      "name": "UV01_3.mtl",
+      "bytes": 68,
+      "sha256": "f90dc6a331b7c8914b9f6f7332ced09809a3eebe508f29b6b49f3f77fbf96459"
+    },
+    {
+      "name": "UV01_3.obj",
+      "bytes": 18438743,
+      "sha256": "3fdbb15fee4b32b3f67a62d2f81d2c07ee5b8c4845da27ec0e14b9e819938141"
+    },
+    {
+      "name": "UV01_4.mtl",
+      "bytes": 68,
+      "sha256": "dbaaaef66772b435eee1e9574c37cd4738f9d1129ca5a878d324519af2485ab2"
+    },
+    {
+      "name": "UV01_4.obj",
+      "bytes": 18518199,
+      "sha256": "d0ac32b3c2dc06011a88d920c4e0938f259e9189940781266fc670ab4ba797a3"
+    },
+    {
+      "name": "UV01_5.mtl",
+      "bytes": 68,
+      "sha256": "c412a3beb44d9835cb9bd89f9e825806327cd3f3ca09444f0e258e379736b26f"
+    },
+    {
+      "name": "UV01_5.obj",
+      "bytes": 17614258,
+      "sha256": "3d78077fd5ba822559337a2aef91bf5de3e1538bd4f0e78bb3f0116f7d355ccf"
+    },
+    {
+      "name": "UV01_6.mtl",
+      "bytes": 68,
+      "sha256": "64f2de4bda357f48c787c5919e8d1bacc222ae98419056188c1487fa02ead5d0"
+    },
+    {
+      "name": "UV01_6.obj",
+      "bytes": 19409965,
+      "sha256": "b5cd2bf8dc98843f4848138bb14da0e2b636516371d0d06b69deee09e2c2ee7f"
+    },
+    {
+      "name": "UV01_7.mtl",
+      "bytes": 68,
+      "sha256": "b96b75af38e4618f0f3d1f59bf69aec988850ad6f3fc9a5cccf96b6f2a6aa7c0"
+    },
+    {
+      "name": "UV01_7.obj",
+      "bytes": 18576490,
+      "sha256": "7c5f1309b8f54b8c9841aa140cb75103fb189cadb82976ab0837233dd9a42e89"
+    },
+    {
+      "name": "UV01_8.mtl",
+      "bytes": 68,
+      "sha256": "f657b49df2a92d6b1e647f1e06040db223daa8c1c82f2eedb86b4225e109ca1d"
+    },
+    {
+      "name": "UV01_8.obj",
+      "bytes": 20240419,
+      "sha256": "450e7c28b8eca142ee3bce30f56a96e9f25c1a8e2dbed9ce905a79c17c58a943"
+    },
+    {
+      "name": "UV01_9.mtl",
+      "bytes": 68,
+      "sha256": "b60c6adb1602c5ed132a4008f17e084a32b4866f1eb0e6e0d75e07e75b80e0d1"
+    },
+    {
+      "name": "UV01_9.obj",
+      "bytes": 16870895,
+      "sha256": "23b933dc3b5a7d559042925520b7581e6f29059a68832a23198b6a91ecb5d826"
+    },
+    {
+      "name": "UV02.mtl",
+      "bytes": 49,
+      "sha256": "1f390fb890b1ca12f9e21cf51fd58187ed61f6349d2b82eb66f39e7492a0a129"
+    },
+    {
+      "name": "UV02.obj",
+      "bytes": 311698,
+      "sha256": "fa5be5303f88fa22d8b143b73a1986776e10289e4c9268765e83ab1699bc060d"
+    },
+    {
+      "name": "UV02.tga.png",
+      "bytes": 450620,
+      "sha256": "db129e157ca177fc00ddc10ba5a6a1412927ac68b1d07361c89378ec03503e96"
+    },
+    {
+      "name": "UV03.mtl",
+      "bytes": 49,
+      "sha256": "32fb4ba2c2a9df76cadc81c480d92d854bf461ce081d039b265960b8e4e0e236"
+    },
+    {
+      "name": "UV03.obj",
+      "bytes": 17389669,
+      "sha256": "790adc29049fa67d2aeb026e71557e8d824964d9b54a3cf7d99a2695b3c424f3"
+    },
+    {
+      "name": "UV03_1.mtl",
+      "bytes": 51,
+      "sha256": "d80e7129d5895495f291c5a2a2e883f3b22f1bc999a1a2f66c6548a7e1cf2216"
+    },
+    {
+      "name": "UV03_1.obj",
+      "bytes": 16080588,
+      "sha256": "5f73bd6184e03d78cbb64aef3d876df8712a2feb244b138aa7193c3079e52750"
+    },
+    {
+      "name": "UV03_2.mtl",
+      "bytes": 51,
+      "sha256": "2c2893f8dc80b0a429394aaafa4cb8b43ad87eed6c9a1609028d1b1b4b67643a"
+    },
+    {
+      "name": "UV03_2.obj",
+      "bytes": 8302991,
+      "sha256": "9deeb56dc336c89272f169f928e011553568f31de4f02bbb1240fe175ace5a1c"
+    },
+    {
+      "name": "UV04.mtl",
+      "bytes": 113,
+      "sha256": "07b3fe29afd47551d9cbdc19381b154fc56fe72086288c97b5208facafa46c03"
+    },
+    {
+      "name": "UV04.obj",
+      "bytes": 606183,
+      "sha256": "3cff7aca62502526fe5b6e9f172be5cac5efea7192f15e9d34d00380bb13e136"
+    },
+    {
+      "name": "UV05.mtl",
+      "bytes": 92,
+      "sha256": "2af542ee58e46b5f7ad3f0e783ac99a7878ed7ca256527a11d8a0552978184da"
+    },
+    {
+      "name": "UV05.obj",
+      "bytes": 2059936,
+      "sha256": "f9fa83fc1b141b8a6f6838b6d17d7824f0d1fead06c032c1e9fce4471ab96c95"
+    },
+    {
+      "name": "UV06.mtl",
+      "bytes": 112,
+      "sha256": "8587ac19fe221e7d10609beb0c2a1dfc4addbd7dccfa4b1f3fb39ae2fa73f45a"
+    },
+    {
+      "name": "UV06.obj",
+      "bytes": 339888,
+      "sha256": "90acd993063d7a0f246b539ea42816db0907fb6a05bcb33be3b4f97d831f62a9"
+    },
+    {
+      "name": "UV07.mtl",
+      "bytes": 127,
+      "sha256": "c5d445a440e3eb6dc0a61fd4464982fb200061ad5353a661e5a446403704d46c"
+    },
+    {
+      "name": "UV07.obj",
+      "bytes": 1409060,
+      "sha256": "387afe9f47c74c60782f02713473ca08d74eda394b65164806d6bcbb43e50056"
+    },
+    {
+      "name": "UV08.mtl",
+      "bytes": 61,
+      "sha256": "aec10f4ad4860f9547a29b576b742fbe55537209a55617a92f574360add8e7bf"
+    },
+    {
+      "name": "UV08.obj",
+      "bytes": 785053,
+      "sha256": "b46a1325f46890e1fe693f760bddf49065c1542532120fcf5fd0f191dcd0161a"
+    },
+    {
+      "name": "UV09.mtl",
+      "bytes": 83,
+      "sha256": "7e594d50dc0d77ffb52e864b9d23318646008561a1fa25b5af91f49c951c23db"
+    },
+    {
+      "name": "UV09.obj",
+      "bytes": 7809641,
+      "sha256": "1a0e5ca1b54f73877da74337ff327ba86e85d7ea4bb8a83f56618a3eb6aa3da0"
+    },
+    {
+      "name": "UV10.mtl",
+      "bytes": 77,
+      "sha256": "bb0dcf2f2cba13ff6ec0d938c1a1a06dfe5268bb4dedcf489ffa3e61ca985e7b"
+    },
+    {
+      "name": "UV10.obj",
+      "bytes": 38955,
+      "sha256": "6a225c604a163997385692360b322df780179b159e6f2ee83ef8e2ecfe2fd829"
+    }
+  ],
+  "imported_triangles": 1167257,
+  "clean_triangles": 1167014,
+  "export_triangles": 510574,
+  "source_bytes": 243805840,
+  "compression": {
+    "method": "Draco",
+    "level": 6,
+    "position_bits": 16,
+    "normal_bits": 12,
+    "texcoord_bits": 14
+  },
+  "glb_bytes": 5206968,
+  "saved_percent": 97.86
+}

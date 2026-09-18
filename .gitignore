@@ -1,0 +1,10 @@
+.cache/
+.npm-cache/
+node_modules/
+dist/
+*.blend
+*.blend1
+*.zip
+*.obj
+*.mtl
+source/

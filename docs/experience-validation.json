@@ -2,8 +2,9 @@
   "checks": [
     "model ready; audio opt-in",
     "camera interpolates and completes",
+    "editorial compositions; selected 3D character visibility",
     "rapid navigation; lighting; free camera",
-    "cheer; dialog; reduced motion; letter",
+    "cheer; dialog; reduced motion; letter; hidden 3D character",
     "audio explicit on/off",
     "all 7 mobile chapters; no horizontal overflow",
     "model failure leaves navigation usable"
